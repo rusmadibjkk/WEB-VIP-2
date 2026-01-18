@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUII PREM PANEL - V4 FINAL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --neon-blue: #00f2ff; --dark-bg: #020617; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--dark-bg); color: #e2e8f0; overflow: hidden; }
+        .neon-glow { text-shadow: 0 0 10px var(--neon-blue); }
+        #sidebar { transition: 0.4s; background: rgba(15, 23, 42, 0.98); border-right: 1px solid var(--neon-blue); z-index: 100; }
+        .page { display: none; animation: fadeIn 0.4s ease-out; height: 82vh; overflow-y: auto; padding-bottom: 50px; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .input-style { background: #1e293b; border: 1px solid #334155; color: white; padding: 12px; border-radius: 12px; width: 100%; outline: none; }
+        
+        .check-container { display: flex; align-items: center; gap: 10px; background: #0f172a; padding: 10px 15px; border-radius: 12px; border: 1px solid #334155; cursor: pointer; transition: 0.3s; }
+        .check-container:hover { border-color: var(--neon-blue); }
+        .check-container input { display: none; }
+        .checkmark { width: 18px; height: 18px; border: 2px solid #334155; border-radius: 4px; position: relative; }
+        .check-container input:checked + .checkmark { background: var(--neon-blue); border-color: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
+        .check-container input:checked + .checkmark::after { content: '✔'; position: absolute; color: black; font-size: 12px; font-weight: bold; left: 2px; top: -2px; }
+    </style>
+</head>
+<body>
+
+    <div id="loginPage" class="fixed inset-0 flex items-center justify-center bg-slate-950 z-[1000] p-6 text-white text-center">
+        <div class="w-full max-w-sm p-8 bg-slate-900 rounded-[2.5rem] border border-cyan-500 shadow-[0_0_20px_rgba(0,242,255,0.2)]">
+            <h1 class="text-3xl font-black neon-glow mb-2 italic uppercase">Ruii Panel</h1>
+            <p class="text-slate-500 text-[9px] mb-8 tracking-[0.3em] font-bold uppercase italic">V4 Premium Multi-Access</p>
+            <div class="space-y-4">
+                <input type="text" id="userIn" placeholder="Username" class="input-style focus:border-cyan-400">
+                <input type="password" id="passIn" placeholder="Password" class="input-style focus:border-cyan-400">
+                <button onclick="handleLogin()" class="w-full bg-cyan-500 text-black py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-white transition">Sign In</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mainDashboard" class="hidden min-h-screen">
+        <header class="fixed top-0 w-full bg-slate-900/80 backdrop-blur-md border-b border-cyan-900 px-6 py-4 flex items-center justify-between z-50">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleNav()" class="text-2xl text-cyan-400"><i class="fa-solid fa-bars-staggered"></i></button>
+                <span class="font-bold text-xl neon-glow italic uppercase">Ruii Panel</span>
+            </div>
+            <div id="roleBadge" class="px-4 py-1 rounded-full bg-cyan-500 text-black text-[9px] font-black uppercase">GUEST</div>
+        </header>
+
+        <nav id="sidebar" class="fixed top-0 left-0 h-full w-72 -translate-x-full pt-24 px-6 shadow-2xl">
+            <div class="space-y-2" id="menuList"></div>
+            <div class="absolute bottom-10 left-6 right-6">
+                <button onclick="location.reload()" class="w-full p-4 rounded-2xl bg-red-500/10 text-red-500 font-bold flex items-center gap-3"><i class="fa-solid fa-power-off"></i> Logout</button>
+            </div>
+        </nav>
+
+        <div class="pt-24 px-4 max-w-xl mx-auto">
+            
+            <section id="wr-page" class="page">
+                <div class="bg-slate-900 p-8 rounded-[2rem] border-2 border-yellow-500/50">
+                    <h2 class="text-2xl font-bold text-yellow-500 mb-6 font-[Orbitron] italic text-center underline italic">WR CALCULATOR</h2>
+                    <div class="space-y-4">
+                        <input type="number" id="tMatch" class="input-style" placeholder="Total Match">
+                        <input type="number" id="tWr" class="input-style" placeholder="WR Sekarang (%)">
+                        <input type="number" id="targetWr" class="input-style" placeholder="Target WR (%)">
+                        <button onclick="hitungWR()" class="w-full py-4 rounded-xl bg-yellow-500 text-black font-black uppercase">Hitung</button>
+                        <div id="wrResult" class="hidden p-5 bg-yellow-500/10 border-l-4 border-yellow-500 rounded-r-xl mt-4 text-center">
+                            <h3 class="text-4xl font-black text-yellow-500"><span id="winNeeded">0</span> WIN</h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="repo-page" class="page">
+                <div class="bg-slate-900 p-8 rounded-[2rem] border border-cyan-500/30 text-center">
+                    <h2 class="text-2xl font-bold neon-glow mb-4 uppercase italic">Github Deployer</h2>
+                    <input type="text" id="repoName" placeholder="Nama Website (Repo)" class="input-style mb-4">
+                    <textarea id="htmlContent" rows="5" placeholder="Masukkan Kode HTML/CSS/JS..." class="input-style font-mono text-xs mb-4"></textarea>
+                    <button onclick="executeDeploy()" class="w-full bg-cyan-600 text-white py-4 rounded-xl font-black uppercase shadow-lg shadow-cyan-500/20">🚀 Publish Website</button>
+                    <div id="repoStatus" class="hidden p-4 rounded-xl bg-slate-800 border border-cyan-500 mt-4 text-xs"></div>
+                </div>
+            </section>
+            
+            <section id="ip-page" class="page">
+                <div class="bg-slate-900 p-8 rounded-[2rem] border border-slate-800">
+                    <h2 class="neon-glow text-xl font-bold mb-4 uppercase italic">IP TRACKER</h2>
+                    <input type="text" id="ipInput" placeholder="Masukkan IP Target..." class="input-style mb-4">
+                    <button onclick="trackTarget()" class="w-full bg-cyan-500 text-black py-4 rounded-xl font-bold uppercase">Trace IP</button>
+                    <div id="ipResult" class="mt-4 p-4 text-xs text-cyan-300 font-mono bg-black/40 rounded-xl whitespace-pre-line"></div>
+                </div>
+            </section>
+            
+            <section id="ngl-page" class="page">
+                <div class="bg-slate-900 p-8 rounded-[2rem] border border-slate-800 text-center">
+                    <h2 class="text-pink-500 text-xl font-bold mb-4 uppercase italic">NGL SPAMMER</h2>
+                    <input type="text" id="nglUser" placeholder="Username NGL" class="input-style mb-4">
+                    <input type="number" id="nglCount" placeholder="Jumlah" class="input-style mb-4">
+                    <button onclick="fireNgl()" class="w-full bg-pink-600 text-white py-4 rounded-xl font-bold uppercase">Launch</button>
+                    <div id="nglStatus" class="text-center mt-2 text-xs text-pink-400"></div>
+                </div>
+            </section>
+
+            <section id="admin-page" class="page">
+                <div class="bg-slate-900 p-8 rounded-[2rem] border border-cyan-500">
+                    <h2 class="text-2xl font-bold neon-glow mb-6 italic text-center uppercase underline italic">Master Control</h2>
+                    <div class="space-y-4 bg-slate-800/40 p-6 rounded-3xl mb-6 border border-slate-700">
+                        <input type="text" id="newUsername" placeholder="Username Baru" class="input-style text-sm">
+                        <input type="password" id="newPassword" placeholder="Password Baru" class="input-style text-sm">
+                        <select id="newDuration" class="input-style text-xs text-cyan-400 font-bold">
+                            <option value="9999">PERMANEN</option>
+                            <option value="1">1 HARI</option>
+                            <option value="3">3 HARI</option>
+                            <option value="7">7 HARI</option>
+                        </select>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="check-container"><input type="checkbox" class="menu-check" value="WR"><span class="checkmark"></span><span class="text-[10px] font-bold text-yellow-500">WR CALC</span></label>
+                            <label class="check-container"><input type="checkbox" class="menu-check" value="REPO"><span class="checkmark"></span><span class="text-[10px] font-bold text-cyan-400">REPO</span></label>
+                            <label class="check-container"><input type="checkbox" class="menu-check" value="IP"><span class="checkmark"></span><span class="text-[10px] font-bold text-blue-400">IP TRACK</span></label>
+                            <label class="check-container"><input type="checkbox" class="menu-check" value="NGL"><span class="checkmark"></span><span class="text-[10px] font-bold text-pink-500">NGL SPAM</span></label>
+                        </div>
+                        <button onclick="addUser()" class="w-full bg-cyan-500 text-black py-4 rounded-xl font-black uppercase text-sm mt-2">Buat User</button>
+                    </div>
+                    <div id="userList" class="space-y-2"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        const G_TOKEN = "Ghp_xM8UlZkI1k2wP9vQd7YAwFy9zn8ybk1a86rD"; 
+        const MAIN_OWNER = { u: "RUII", p: "18362", r: "OWNER", t: ["WR", "REPO", "IP", "NGL"] };
+        let currentUser = null;
+
+        function handleLogin() {
+            const u = document.getElementById('userIn').value;
+            const p = document.getElementById('passIn').value;
+            if (u === MAIN_OWNER.u && p === MAIN_OWNER.p) { currentUser = MAIN_OWNER; buildApp(); } 
+            else {
+                const db = JSON.parse(localStorage.getItem('rui_db') || '[]');
+                const found = db.find(x => x.username === u && x.password === p);
+                if (found) {
+                    if (new Date().getTime() > found.expiry) return alert("Akun EXPIRED!");
+                    currentUser = { u: found.username, r: 'USER', t: found.type }; buildApp();
+                } else { alert("Login Gagal!"); }
+            }
+        }
+
+        function buildApp() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainDashboard').classList.remove('hidden');
+            document.getElementById('roleBadge').innerText = currentUser.r;
+            const menu = document.getElementById('menuList');
+            menu.innerHTML = "";
+            const addBtn = (id, icon, name, color) => {
+                menu.innerHTML += `<button onclick="showPage('${id}')" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-800 ${color} font-bold transition"><i class="${icon} w-5"></i> ${name}</button>`;
+            };
+            if (currentUser.t.includes('WR')) addBtn('wr-page', 'fa-solid fa-calculator', 'WR Calculator', 'text-yellow-500');
+            if (currentUser.t.includes('REPO')) addBtn('repo-page', 'fa-solid fa-code', 'Auto Repo', 'text-cyan-400');
+            if (currentUser.t.includes('IP')) addBtn('ip-page', 'fa-solid fa-location-dot', 'IP Tracker', 'text-blue-400');
+            if (currentUser.t.includes('NGL')) addBtn('ngl-page', 'fa-solid fa-paper-plane', 'NGL Spammer', 'text-pink-500');
+            if (currentUser.r === 'OWNER') {
+                menu.innerHTML += `<hr class="border-slate-800 my-4">`;
+                addBtn('admin-page', 'fa-solid fa-users-gear', 'MASTER CONTROL', 'bg-cyan-500 text-black');
+                renderUserList(); showPage('admin-page');
+            } else { showPage(document.querySelector('.page').id); }
+        }
+
+        async function executeDeploy() {
+            const n = document.getElementById('repoName').value.trim(), h = document.getElementById('htmlContent').value, s = document.getElementById('repoStatus');
+            if(!n || !h) return alert("Lengkapi data!");
+            s.classList.remove('hidden'); s.innerHTML = "<span class='animate-pulse text-yellow-400'>🚀 Deploying Website...</span>";
+            try {
+                const head = { 'Authorization': `token ${G_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' };
+                const uData = await (await fetch('https://api.github.com/user', { headers: head })).json();
+                const user = uData.login;
+                
+                await fetch('https://api.github.com/user/repos', { method:'POST', headers: head, body:JSON.stringify({name:n, auto_init:true}) });
+                
+                const upload = await fetch(`https://api.github.com/repos/${user}/${n}/contents/index.html`, {
+                    method:'PUT', headers: head, body:JSON.stringify({ message:"RUII", content:btoa(unescape(encodeURIComponent(h))) })
+                });
+
+                if(upload.ok) {
+                    await fetch(`https://api.github.com/repos/${user}/${n}/pages`, {
+                        method:'POST', headers: head, body:JSON.stringify({ source: { branch: 'main', path: '/' } })
+                    });
+                    s.innerHTML = `<div class='text-green-400 font-bold'>✅ PUBLISHED!</div><a href='https://${user}.github.io/${n}/' target='_blank' class='block mt-2 bg-cyan-600 p-2 rounded text-center'>BUKA WEBSITE</a>`;
+                }
+            } catch(e) { s.innerText = "Gagal Deploy!"; }
+        }
+
+        function addUser() {
+            const u = document.getElementById('newUsername').value.trim(), p = document.getElementById('newPassword').value.trim(), d = parseInt(document.getElementById('newDuration').value);
+            const checked = []; document.querySelectorAll('.menu-check:checked').forEach(c => checked.push(c.value));
+            if(!u || !p || checked.length === 0) return alert("Data tidak lengkap!");
+            const db = JSON.parse(localStorage.getItem('rui_db') || '[]');
+            db.push({ username: u, password: p, type: checked, expiry: new Date().getTime() + (d * 86400000), durationDays: d });
+            localStorage.setItem('rui_db', JSON.stringify(db));
+            renderUserList(); alert("User Berhasil!");
+        }
+
+        function renderUserList() {
+            const db = JSON.parse(localStorage.getItem('rui_db') || '[]');
+            const list = document.getElementById('userList'); list.innerHTML = "";
+            db.forEach((u, i) => {
+                list.innerHTML += `<div class="bg-slate-800/80 p-4 rounded-2xl mb-2 flex justify-between items-center border border-slate-700"><div><p class="font-bold text-sm text-white">${u.username}</p><p class="text-[9px] text-yellow-500 uppercase">${u.type.join(", ")}</p></div><button onclick="delUser(${i})" class="text-red-500"><i class="fa-solid fa-trash-can"></i></button></div>`;
+            });
+        }
+
+        function delUser(i) { let db = JSON.parse(localStorage.getItem('rui_db') || '[]'); db.splice(i,1); localStorage.setItem('rui_db', JSON.stringify(db)); renderUserList(); }
+        function showPage(id) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); if(window.innerWidth<1024) document.getElementById('sidebar').classList.add('-translate-x-full'); }
+        function toggleNav() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); }
+        function hitungWR() {
+            const m = parseFloat(document.getElementById('tMatch').value), w = parseFloat(document.getElementById('tWr').value), t = parseFloat(document.getElementById('targetWr').value);
+            const res = Math.ceil((m * (t/100) - Math.round(m*(w/100))) / (1 - (t/100)));
+            document.getElementById('winNeeded').innerText = isNaN(res) || res < 0 ? 0 : res; document.getElementById('wrResult').classList.remove('hidden');
+        }
+        async function trackTarget() { const ip = document.getElementById('ipInput').value; const r = document.getElementById('ipResult'); r.innerText="Tracing..."; try { const d=await (await fetch(`https://ipapi.co/${ip}/json/`)).json(); r.innerText=`IP: ${d.ip}\nCity: ${d.city}\nISP: ${d.org}`; } catch(e){r.innerText="Error.";} }
+        async function fireNgl() { const u=document.getElementById('nglUser').value, c=document.getElementById('nglCount').value, s=document.getElementById('nglStatus'); for(let i=1;i<=c;i++){ try{ await fetch('https://ngl.link/api/submit',{method:'POST',body:new URLSearchParams({username:u,question:'Spam By RUII',deviceId:'x'})}); s.innerText=`Sent ${i}/${c}`; }catch(e){} } s.innerText="DONE!"; }
+    </script>
+</body>
+</html>
